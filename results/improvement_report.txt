@@ -1,0 +1,17 @@
+=================================================================
+  Improvement Experiment: YOLOv8n vs YOLOv8s
+=================================================================
+Metric                   YOLOv8n (base)    YOLOv8s (exp)    Delta
+-----------------------------------------------------------------
+mAP@0.5                          0.6239           0.5539  -0.0700
+Precision                        0.6553           0.5938  -0.0615
+Recall                           0.6930           0.6254  -0.0675
+CPU Inference (ms)                 79.7            253.5   +173.9
+ONNX Size (MB)                     11.7             42.7    +31.0
+-----------------------------------------------------------------
+
+Conclusion:
+YOLOv8s does NOT improve accuracy (-0.070 mAP@0.5 delta).
+Neither model meets a strict 10ms budget -- quantization or smaller input would be needed.
+For edge deployment, YOLOv8n is the better choice: 12 MB vs 43 MB, and 80 ms vs 254 ms CPU latency.
+=================================================================

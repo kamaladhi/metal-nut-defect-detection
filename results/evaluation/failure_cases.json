@@ -1,0 +1,52 @@
+[
+  {
+    "image": "bent_010",
+    "type": "FN",
+    "reason": "False Negative: bent defect missed. Likely low contrast or small defect region below confidence threshold."
+  },
+  {
+    "image": "bent_012",
+    "type": "FN",
+    "reason": "False Negative: bent defect missed. Likely low contrast or small defect region below confidence threshold."
+  },
+  {
+    "image": "bent_018",
+    "type": "FN",
+    "reason": "False Negative: bent defect missed. Likely low contrast or small defect region below confidence threshold."
+  },
+  {
+    "image": "color_004",
+    "type": "FN",
+    "reason": "False Negative: color defect missed. Likely low contrast or small defect region below confidence threshold."
+  },
+  {
+    "image": "color_015",
+    "type": "FN",
+    "reason": "False Negative: color defect missed. Likely low contrast or small defect region below confidence threshold."
+  },
+  {
+    "image": "color_019",
+    "type": "FN",
+    "reason": "False Negative: color defect missed. Likely low contrast or small defect region below confidence threshold."
+  },
+  {
+    "image": "scratch_000",
+    "type": "FN",
+    "reason": "False Negative: scratch defect missed. Likely low contrast or small defect region below confidence threshold."
+  },
+  {
+    "image": "scratch_001",
+    "type": "FN",
+    "reason": "False Negative: scratch defect missed. Likely low contrast or small defect region below confidence threshold."
+  },
+  {
+    "image": "scratch_009",
+    "type": "FN",
+    "reason": "False Negative: scratch defect missed. Likely low contrast or small defect region below confidence threshold."
+  },
+  {
+    "image": "scratch_012",
+    "type": "FN",
+    "reason": "False Negative: scratch defect missed. Likely low contrast or small defect region below confidence threshold."
+  }
+]

@@ -1,0 +1,13 @@
+Metal Nut Defect Detection -- Evaluation Metrics
+==================================================
+Class          AP@0.5
+----------------------
+bent           0.6950
+color          0.4801
+flip           0.9950
+scratch        0.3254
+----------------------
+mAP@0.5        0.6239
+Precision      0.6553
+Recall         0.6930
+mAP@0.5:0.95   0.2842

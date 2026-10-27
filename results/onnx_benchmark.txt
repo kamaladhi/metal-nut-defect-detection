@@ -1,0 +1,29 @@
+============================================================
+  ONNX Export & CPU Inference Benchmark
+============================================================
+Model (ONNX)  : best.onnx
+Model size    : 11.7 MB
+Image size    : 640 x 640
+CPU           : 12th Gen Intel(R) Core(TM) i5-12500H
+Threads       : 1 (single-thread, edge-conservative)
+Warmup runs   : 20
+Benchmark runs: 100
+------------------------------------------------------------
+Mean latency  : 79.5 ms
+Std deviation : 3.1 ms
+Min latency   : 77.4 ms
+Max latency   : 95.7 ms
+Throughput    : 12.6 FPS (single image, single thread)
+
+Multi-thread (all performance cores, auto threads):
+Mean latency  : 22.8 ms
+Min latency   : 21.3 ms
+Max latency   : 24.8 ms
+Throughput    : 43.9 FPS
+------------------------------------------------------------
+NOTE: An earlier run of this script reported 119.3 ms.
+That figure included ONNX Runtime model-loading overhead
+on the first cold-cache run. After 20 warmup inferences
+the steady-state latency is 79.5 ms (1-thread), consistent
+with the improvement.py benchmark (79.7 ms, same settings).
+============================================================

@@ -20,11 +20,12 @@ env/
 .ipynb_checkpoints/
 *.ipynb
 
-# Dataset (large files — store separately or use Git LFS)
+# Dataset & raw evaluation archives
 metal_nut/
 metal_nut.tar.xz
+mvtec_ad_evaluation/
 mvtec_ad_evaluation.tar.xz
-dataset/images/
+dataset/
 
 # Model weights (upload ONNX separately via release or Drive link)
 *.pt

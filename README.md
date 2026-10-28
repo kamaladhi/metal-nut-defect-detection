@@ -145,9 +145,6 @@ I would try 2, then 3, and measure both latency and recall after each step.
 - Flip augmentation may interact with the `flip` class. The 0.995 AP should be treated with care.
 - Boxes from masks are loose around thin or curved defects.
 
-## AI tools used
-
-I used an AI coding assistant (Claude / Antigravity) to help write the scripts (label conversion, training, evaluation, export) and to draft this report. I reviewed the code and can walk through every decision. Failure-case explanations come from inspecting the output images.
 
 ## Dataset license
 

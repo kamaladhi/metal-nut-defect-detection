@@ -1,5 +1,6 @@
-import sys, io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 """
 Draws YOLO bounding boxes on images so you can visually verify
@@ -11,9 +12,9 @@ import numpy as np
 import random
 from pathlib import Path
 
-# ── Config ────────────────────────────────────────────────────────────────────
-DATASET_DIR  = Path(r"D:\Nxtwave\InsiSo\dataset")
-OUTPUT_DIR   = Path(r"D:\Nxtwave\InsiSo\results\label_check")
+BASE_DIR     = Path(__file__).resolve().parent
+DATASET_DIR  = BASE_DIR / "dataset"
+OUTPUT_DIR   = BASE_DIR / "results" / "label_check"
 CLASS_NAMES  = ["bent", "color", "flip", "scratch"]
 SAMPLES_PER_CLASS = 4   # how many images to show per defect class
 

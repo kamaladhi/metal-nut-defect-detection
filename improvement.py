@@ -1,29 +1,6 @@
-# -*- coding: utf-8 -*-
-import sys, io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-
-"""
-improvement.py
-==============
-Phase 5: Improvement experiment — YOLOv8n (baseline) vs YOLOv8s (larger).
-
-Compares:
-  - Baseline : YOLOv8n (3.2M params, ~6 MB)  -- already trained
-  - Experiment: YOLOv8s (11.2M params, ~22 MB)
-
-Reports:
-  - mAP@0.5, Precision, Recall for both
-  - ONNX CPU inference time for both
-  - Conclusion: which is better for edge deployment and why
-
-Output:
-  - runs/detect/metal_nut_yolov8s/          -- YOLOv8s training run
-  - results/improvement_report.txt          -- comparison table
-
-Usage:
-    python improvement.py
-    (Run AFTER train.py has completed -- baseline best.pt must exist)
-"""
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 import time
 import torch
@@ -36,14 +13,16 @@ try:
 except ImportError:
     raise ImportError("Run: pip install onnxruntime")
 
-# ── Config ────────────────────────────────────────────────────────────────────
-DATASET_YAML   = Path(r"D:\Nxtwave\InsiSo\dataset\data.yaml")
-OUTPUT_DIR     = Path(r"D:\Nxtwave\InsiSo\runs\detect")
-RESULTS_DIR    = Path(r"D:\Nxtwave\InsiSo\results")
+BASE_DIR       = Path(__file__).resolve().parent
+DATASET_YAML   = BASE_DIR / "dataset" / "data.yaml"
+OUTPUT_DIR     = BASE_DIR / "runs" / "detect"
+RESULTS_DIR    = BASE_DIR / "results"
 
 BASELINE_WEIGHTS = OUTPUT_DIR / "metal_nut_yolov8n" / "weights" / "best.pt"
+if not BASELINE_WEIGHTS.exists() and (BASE_DIR / "best.pt").exists():
+    BASELINE_WEIGHTS = BASE_DIR / "best.pt"
 EXP_RUN_NAME     = "metal_nut_yolov8s"
-EXP_WEIGHTS_NAME = "yolov8s.pt"         # downloads automatically
+EXP_WEIGHTS_NAME = BASE_DIR / "yolov8s.pt" if (BASE_DIR / "yolov8s.pt").exists() else "yolov8s.pt"
 
 IMG_SIZE    = 640
 CONF_THRESH = 0.25

@@ -1,6 +1,7 @@
 
-import sys, io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 """Convert MVTec AD pixel masks -> YOLO bounding-box labels
 and build the train/val dataset split.
@@ -15,8 +16,9 @@ import numpy as np
 from pathlib import Path
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-DATA_ROOT    = Path(r"D:\Nxtwave\InsiSo\metal_nut")
-DATASET_DIR  = Path(r"D:\Nxtwave\InsiSo\dataset")
+BASE_DIR     = Path(__file__).resolve().parent
+DATA_ROOT    = BASE_DIR / "metal_nut"
+DATASET_DIR  = BASE_DIR / "dataset"
 RANDOM_SEED  = 42
 VAL_RATIO    = 0.30          # 30 % of defective images go to val
 MIN_AREA_PX  = 200           # ignore contours smaller than this (noise filter)

@@ -1,20 +1,6 @@
-# -*- coding: utf-8 -*-
-import sys, io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-
-"""
-export_onnx.py
-==============
-Phase 4: Export the trained YOLOv8n model to ONNX and benchmark
-CPU inference time per image.
-
-Outputs:
-  - runs/detect/metal_nut_yolov8n/weights/best.onnx  -- exported model
-  - results/onnx_benchmark.txt                        -- inference speed report
-
-Usage:
-    python export_onnx.py
-"""
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 import time
 import numpy as np
@@ -28,10 +14,12 @@ try:
 except ImportError:
     raise ImportError("Run: pip install onnxruntime")
 
-# ── Config ────────────────────────────────────────────────────────────────────
-WEIGHTS     = Path(r"D:\Nxtwave\InsiSo\runs\detect\metal_nut_yolov8n\weights\best.pt")
-ONNX_OUT    = Path(r"D:\Nxtwave\InsiSo\runs\detect\metal_nut_yolov8n\weights\best.onnx")
-REPORT_OUT  = Path(r"D:\Nxtwave\InsiSo\results\onnx_benchmark.txt")
+BASE_DIR    = Path(__file__).resolve().parent
+WEIGHTS     = BASE_DIR / "runs" / "detect" / "metal_nut_yolov8n" / "weights" / "best.pt"
+if not WEIGHTS.exists() and (BASE_DIR / "best.pt").exists():
+    WEIGHTS = BASE_DIR / "best.pt"
+ONNX_OUT    = BASE_DIR / "best.onnx"
+REPORT_OUT  = BASE_DIR / "results" / "onnx_benchmark.txt"
 IMG_SIZE    = 640        # must match training imgsz
 N_WARMUP    = 20         # warmup runs (excluded from measurement)
 N_BENCH     = 100        # benchmark runs
@@ -146,7 +134,6 @@ def main():
 
     REPORT_OUT.write_text("\n".join(report_lines))
     print(f"\nReport saved to: {REPORT_OUT}")
-    print("\nNext step: run improvement.py")
 
 
 if __name__ == "__main__":

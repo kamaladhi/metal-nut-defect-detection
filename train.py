@@ -1,37 +1,16 @@
-# -*- coding: utf-8 -*-
-import sys, io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-
-"""
-train.py
-========
-Phase 2: Fine-tune YOLOv8n on the metal nut defect dataset.
-
-Strategy for small dataset (93 defective images total):
-  1. Transfer learning   — start from COCO-pretrained yolov8n.pt
-  2. Freeze backbone     — first 10 layers frozen to protect pretrained features
-  3. Heavy augmentation  — mosaic, copy-paste, flips, rotation, HSV jitter
-  4. Negatives           — 110 good images in train to reduce false positives
-  5. Regularization      — dropout, weight decay, early stopping
-
-Run:
-    python train.py
-
-Output:
-    runs/detect/metal_nut_yolov8n/weights/best.pt   <- best checkpoint
-    runs/detect/metal_nut_yolov8n/results.csv        <- per-epoch metrics
-    runs/detect/metal_nut_yolov8n/results.png        <- training curves
-"""
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 import torch
 from pathlib import Path
 from ultralytics import YOLO
 
-# ── Paths ─────────────────────────────────────────────────────────────────────
-DATASET_YAML = Path(r"D:\Nxtwave\InsiSo\dataset\data.yaml")
-OUTPUT_DIR   = Path(r"D:\Nxtwave\InsiSo\runs\detect")
+BASE_DIR     = Path(__file__).resolve().parent
+DATASET_YAML = BASE_DIR / "dataset" / "data.yaml"
+OUTPUT_DIR   = BASE_DIR / "runs" / "detect"
 RUN_NAME     = "metal_nut_yolov8n"
-WEIGHTS      = "yolov8n.pt"          # downloads automatically if not present
+WEIGHTS      = BASE_DIR / "yolov8n.pt" if (BASE_DIR / "yolov8n.pt").exists() else "yolov8n.pt"
 # ──────────────────────────────────────────────────────────────────────────────
 
 def get_device():

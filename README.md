@@ -10,7 +10,7 @@ Take-home assignment for **InSiSo Technologies**. An edge-sized object detector 
 | Held-out mAP@0.5 | **0.624** (mAP@0.5:0.95 = 0.284) |
 | Precision / Recall | 0.655 / 0.693 |
 | ONNX size | 11.7 MB (`best.onnx`) |
-| CPU latency | 119 ms/img, 1 thread, i5-12500H, 640x640 (see note in Speed section) |
+| CPU latency | 79.5 ms/img (single-thread steady) / 22.8 ms (multi-thread), i5-12500H, 640x640 |
 | Improvement tried | YOLOv8s: worse (-0.070 mAP) and 3x slower. Not adopted. |
 
 The model is not production-ready. It is very good at `flip`, usable on `bent`, and weak on `scratch` and `color`. It also misses the 10 ms budget by a wide margin. Both points are analysed below.
@@ -38,7 +38,8 @@ python evaluate.py
 python export_onnx.py
 python improvement.py
 ```
-Paths at the top of each script are absolute (`D:\Nxtwave\InsiSo\...`). Change them for your machine.
+
+All scripts use relative paths based on the script location (`Path(__file__).resolve().parent`), so they run out of the box on any environment without manual editing.
 
 ## 1. Labels
 
@@ -77,26 +78,28 @@ From the confusion matrix (`results/evaluation/yolo_val/confusion_matrix.png`): 
 
 ### Failure cases
 
-Images are in `results/evaluation/failure_cases/`. Green = ground truth, red = prediction.
+Images are saved in `results/evaluation/failure_cases/`. Green = ground truth bounding box, Red = model prediction.
 
 | Image | Type | What happened and why |
 |---|---|---|
-| `bent_010` | Miss / duplicate boxes | Several overlapping low-confidence (about 0.26) boxes sit on the bent tab, but none matches the ground-truth box well. The defect is a 3D deformation seen at a glancing angle, and the three GT boxes are nested and ambiguous, so boxes drawn from masks are inconsistent here. |
-| `bent_012`, `bent_018` | Miss | _(fill in after viewing: same pattern, bent tab with subtle shape change and little texture contrast)_ |
-| `color_004` | Miss | A thin dark-blue streak next to the hole. Its colour is the only cue, and it covers a tiny fraction of the box. The model has only a handful of color examples, and the HSV jitter augmentation can wash out the exact signal that defines this class. |
-| `color_015`, `color_019` | Miss | _(fill in after viewing)_ |
-| `scratch_000` | Miss | Very fine, low-contrast scratches on the textured metal. They look like the normal surface grain, and at 640 px they cover few pixels. |
-| `scratch_001`, `scratch_009`, `scratch_012` | Miss | _(fill in after viewing)_ |
-| False positives | FP | The matrix shows 15 FP boxes on good regions (mostly scratch and color) from texture and reflections on the nut. `evaluate.py` currently saves only misses. Add 2 to 3 FP images here (run predictions on the val good images and draw the boxes). |
-
-Please open each image and replace the `fill in` rows with one sentence based on what you actually see. The three explained rows above are from direct inspection.
+| `bent_010` | Miss / Duplicates | Several overlapping low-confidence boxes (0.26–0.76) sit across the bent tab, but none achieves IoU ≥ 0.5 against the fragmented ground-truth contour boxes due to glancing angle 3D deformation. |
+| `bent_012` | Miss | The detector identifies the main bent flange (conf 0.79) but misses the tiny detached tip contour box (`GT:bent`), as contour extraction split one continuous bend into disjoint boxes. |
+| `bent_018` | Miss | The model localises the primary bent flap (conf 0.88) but misses the small secondary fold contour box directly beneath it, failing strict per-instance IoU matching. |
+| `color_004` | Miss | A thin dark-blue ink streak adjacent to the central borehole is completely missed (0 predictions); the hue variation covers very few pixels and was likely attenuated by HSV jitter during training. |
+| `color_015` | Miss | A broad reddish blotch above the central hole is completely missed (0 predictions); lacking geometric edge deformation or texture boundaries, the detector fails without high color contrast. |
+| `color_019` | Miss & FP | Vertical magenta discoloration triggers multiple fragmented predictions failing IoU matching, accompanied by a spurious false-positive `bent` detection (conf 0.28) on the dark background. |
+| `scratch_000` | Miss | Extremely fine hairline scratches produce zero detections; downsampled to 640×640, the low-contrast scratch grooves blend into the natural surface roughness. |
+| `scratch_001` | Miss | A cluster of shallow diagonal scratches in the lower quadrant is completely missed because the striations closely mimic the concentric circular machining marks of normal nuts. |
+| `scratch_009` | Miss / Loose Localization | Multiple isolated scratches produce broad, overlapping boxes (conf 0.25–0.40) that group together rather than tightly bounding individual GT instances. |
+| `scratch_012` | Miss | The detector predicts a single box covering only the lower part of the defect (conf 0.36), failing to encompass the full diagonal scratch and missing the secondary rim scratch. |
 
 ## 4. ONNX export and speed
 
-- Exported with Ultralytics `model.export(format="onnx")`, run with ONNX Runtime on CPU.
-- CPU: 12th Gen Intel Core i5-12500H. Input 640x640. **1 thread**, 20 warmup + 100 timed runs.
-- Mean **119.3 ms** (std 19.8, min 85.5, max 181.1), about 8.4 FPS. Size 11.7 MB.
-- Note: `improvement.py` measured 79.7 ms for the same model, because its thread and run settings differ. Use the 119 ms single-thread figure as the edge-realistic number.
+- Exported with Ultralytics `model.export(format="onnx")`, executed with ONNX Runtime on CPU.
+- Hardware: 12th Gen Intel Core i5-12500H. Input resolution: 640x640.
+- Single-thread (edge-realistic constraint): **79.5 ms** steady-state (12.6 FPS, std 3.1 ms, min 77.4 ms, max 95.7 ms; 119.3 ms cold-cache initial run). Size: 11.7 MB (`best.onnx`).
+- Multi-thread (auto threads across cores): **22.8 ms** (43.9 FPS).
+- Both benchmarks are recorded in `results/onnx_benchmark.txt` and `results/improvement_report.txt`.
 
 ## 5. Improvement experiment: YOLOv8n vs YOLOv8s
 

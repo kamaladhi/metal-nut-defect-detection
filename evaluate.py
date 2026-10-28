@@ -1,21 +1,6 @@
-# -*- coding: utf-8 -*-
-import sys, io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-
-"""
-evaluate.py
-===========
-Phase 3: Evaluate the trained YOLOv8n model on the validation set.
-
-Outputs:
-  - Precision, Recall, mAP@0.5 per class and overall
-  - results/evaluation/metrics_table.txt  -- plain-text metrics table
-  - results/evaluation/failure_cases/     -- annotated failure images (FP + FN)
-  - results/evaluation/confusion_matrix.png
-
-Usage:
-    python evaluate.py
-"""
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 import cv2
 import numpy as np
@@ -24,11 +9,14 @@ from pathlib import Path
 from ultralytics import YOLO
 
 # ── Config ────────────────────────────────────────────────────────────────────
-WEIGHTS      = Path(r"D:\Nxtwave\InsiSo\runs\detect\metal_nut_yolov8n\weights\best.pt")
-DATASET_YAML = Path(r"D:\Nxtwave\InsiSo\dataset\data.yaml")
-VAL_IMG_DIR  = Path(r"D:\Nxtwave\InsiSo\dataset\images\val")
-VAL_LBL_DIR  = Path(r"D:\Nxtwave\InsiSo\dataset\labels\val")
-OUTPUT_DIR   = Path(r"D:\Nxtwave\InsiSo\results\evaluation")
+BASE_DIR     = Path(__file__).resolve().parent
+WEIGHTS      = BASE_DIR / "runs" / "detect" / "metal_nut_yolov8n" / "weights" / "best.pt"
+if not WEIGHTS.exists() and (BASE_DIR / "best.pt").exists():
+    WEIGHTS  = BASE_DIR / "best.pt"
+DATASET_YAML = BASE_DIR / "dataset" / "data.yaml"
+VAL_IMG_DIR  = BASE_DIR / "dataset" / "images" / "val"
+VAL_LBL_DIR  = BASE_DIR / "dataset" / "labels" / "val"
+OUTPUT_DIR   = BASE_DIR / "results" / "evaluation"
 FAILURE_DIR  = OUTPUT_DIR / "failure_cases"
 
 CLASS_NAMES  = ["bent", "color", "flip", "scratch"]
